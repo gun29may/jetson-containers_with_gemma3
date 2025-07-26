@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,28 +13,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from time import sleep
-from queue import Queue
+import copy
 import logging
 import os
-import time
-import copy
 import re
-
-#from settings import load_config
-from utils import process_query, vlm_alert_handler, vlm_chat_completion_handler
-from api_server import VLMServer
-from config import load_config
-from ws_server import WebSocketServer
-
+import shutil
+import time
+from jetson_utils import cudaResize, cudaAllocMapped, cudaMemcpy
+from mmj_utils.monitoring import AlertMonitor
 from mmj_utils.overlay_gen import VLMOverlay
 from mmj_utils.streaming import VideoOutput, VideoSource
 from mmj_utils.vlm import VLM
-from mmj_utils.monitoring import AlertMonitor
-from jetson_utils import cudaResize, cudaAllocMapped, cudaMemcpy
+from queue import Queue
+from time import sleep
+
+from api_server import VLMServer
+from config import load_config
+# from settings import load_config
+from utils import process_query, vlm_alert_handler, vlm_chat_completion_handler
+from ws_server import WebSocketServer
+
+
+def find_config_path(base_env_var):
+    config_path = os.environ[base_env_var]
+    config_path_under_data_dir = os.environ[f"{base_env_var}_UNDER_DATA_DIR"]
+
+    if os.path.exists(config_path_under_data_dir):
+        return config_path_under_data_dir
+    else:
+        os.makedirs(os.path.dirname(config_path_under_data_dir), exist_ok=True)
+        shutil.copy(config_path, config_path_under_data_dir)
+        return config_path_under_data_dir
 
 #Load config
-config_path = os.environ["MAIN_CONFIG_PATH"]
+config_path = find_config_path("MAIN_CONFIG_PATH")
 config = load_config(config_path, "main")
 
 logging.basicConfig(level=logging.getLevelName(config.log_level),

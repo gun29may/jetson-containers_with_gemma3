@@ -28,7 +28,7 @@ git apply $TMP/patches.diff || echo "failed to apply git patches"
 git diff
 
 # OpenCV looks for the cuDNN version in cudnn_version.h, but it's been renamed to cudnn_version_v8.h
-ln -s /usr/include/$(uname -i)-linux-gnu/cudnn_version_v*.h /usr/include/$(uname -i)-linux-gnu/cudnn_version.h
+ln -sfnv /usr/include/$(uname -i)-linux-gnu/cudnn_version_v*.h /usr/include/$(uname -i)-linux-gnu/cudnn_version.h
 
 # patches for FP16/half casts
 function patch_opencv()
@@ -43,7 +43,7 @@ patch_opencv
 cd /opt
 patch_opencv
 cd /opt/opencv-python
-   
+
 # default build flags
 OPENCV_BUILD_ARGS="\
    -DCPACK_BINARY_DEB=ON \
@@ -89,8 +89,16 @@ OPENCV_BUILD_ARGS="${OPENCV_BUILD_ARGS} -DBUILD_opencv_rgbd=OFF"
 # setup environment and build wheel
 export CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)
 export CMAKE_POLICY_VERSION_MINIMUM="3.5"
+export CMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 export ENABLE_CONTRIB=1
 
+cat <<EOF > /opt/opencv-python/cv2/version.py
+opencv_version = "${OPENCV_VERSION}"
+contrib = True
+headless = False
+rolling = False
+EOF
 CMAKE_ARGS="${OPENCV_BUILD_ARGS} -DOPENCV_EXTRA_MODULES_PATH=/opt/opencv-python/opencv_contrib/modules" \
 pip3 wheel --wheel-dir=/opt --verbose .
 

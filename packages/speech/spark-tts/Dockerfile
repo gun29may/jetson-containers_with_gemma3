@@ -2,7 +2,7 @@
 # name: spark-tts
 # group: audio
 # depends: [torchaudio, transformers]
-# requires: ['>=36.1.0', '>=cu126']
+# requires: ['>=36.1.0']
 # test: [test.sh]
 # notes: 'Spark-TTS: An Efficient LLM-Based Text-to-Speech Model with Single-Stream Decoupled Speech Tokens – https://github.com/SparkAudio/Spark-TTS'
 # docs: docs.md
@@ -21,14 +21,10 @@ RUN apt-get update && \
     \
     git clone --branch=${SPARK_TTS_VERSION} https://github.com/SparkAudio/Spark-TTS /opt/spark-tts && \
     cd /opt/spark-tts && \
-    sed -i \
-        -e 's|^numpy=.*||g' \
-        -e 's|^torchaudio=.*||g' \
-        -e 's|^torch=.*||g' \
-        -e 's|^transformers=.*||g' \
-        requirements.txt && \
-    pip3 install -r requirements.txt
-    
+    sed -i 's/==/>=/g' requirements.txt && \
+    sed -i 's/~=/>=/g' requirements.txt && \
+    pip3 install -U -r requirements.txt
+
 COPY inference.py /opt/spark-tts
 
 ENV PYTHONPATH="/opt/spark-tts:${PYTHONPATH}" \
@@ -36,4 +32,4 @@ ENV PYTHONPATH="/opt/spark-tts:${PYTHONPATH}" \
     HUGGINGFACE_HUB_CACHE=/data/models/huggingface \
     HF_HOME=/data/models/huggingface
 
-ENTRYPOINT ["python3", "/opt/spark-tts/inference.py"]
+CMD ["python3", "/opt/spark-tts/inference.py"]

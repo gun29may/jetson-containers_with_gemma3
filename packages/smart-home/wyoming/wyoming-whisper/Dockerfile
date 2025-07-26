@@ -2,7 +2,7 @@
 # name: wyoming-whisper
 # group: wyoming
 # config: config.py
-# depends: [homeassistant-base, cuda, cudnn, python:3.11, faster-whisper]
+# depends: [cuda, cudnn, python, homeassistant-base, faster-whisper]
 # test: test.sh
 # requires: '>=34.1.0'
 # docs: docs.md
@@ -23,12 +23,15 @@ ENV PIP_BREAK_SYSTEM_PACKAGES=1 \
     WHISPER_MODEL="tiny-int8" \
     WHISPER_BEAM_SIZE="1" \
     WHISPER_LANGUAGE="en" \
-    WHISPER_DEBUG="true"
+    WHISPER_DEBUG="true" \
+    WHISPER_COMPUTE_TYPE="default" \
+    WHISPER_INITIAL_PROMPT="" \
+    WHISPER_OFFLINE="false"
 
 COPY rootfs/ /
 COPY *.sh /tmp/wyoming/whisper/
 
-WORKDIR /usr/src
+WORKDIR /
 
 RUN /tmp/wyoming/whisper/install.sh || /tmp/wyoming/whisper/build.sh
 

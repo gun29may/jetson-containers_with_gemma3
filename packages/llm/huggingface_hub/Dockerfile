@@ -3,7 +3,7 @@
 # group: llm
 # depends: [python]
 # test: test.py
-# notes: provides `huggingface-cli` and `huggingface-downloader` tools
+# notes: https://github.com/huggingface/huggingface_hub
 #---
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
@@ -20,10 +20,8 @@ COPY huggingface-downloader.py /usr/local/bin/_huggingface-downloader.py
 # install huggingface_hub package (with CLI)
 RUN set -ex \
     # Fix: ModuleNotFoundError: No module named 'dataclasses' (on JetPack 4) \
-    && pip3 install \
-        huggingface_hub[cli] \
-        dataclasses \
-    \
+    && pip3 install huggingface_hub[cli] \
+    && python3 -c "import sys; sys.version_info < (3, 7) and __import__('subprocess').run(['pip3', 'install', 'dataclasses'])" \
     && chmod a+x /usr/local/bin/huggingface-downloader /usr/local/bin/_huggingface-downloader.py \
     # make sure it loads \
     && huggingface-cli --help \

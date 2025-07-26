@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,22 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from uuid import uuid4
-from time import time
-import re
-import logging
 import json
-
-import requests
-
-from mmj_utils.api_server import APIServer, APIMessage, Response
-from mmj_utils.api_schemas import ChatMessages, StreamAdd
-
-from pydantic import BaseModel, Field, conlist, constr
-from typing import Optional, Dict, Any
-from fastapi import HTTPException
-
+import logging
 import os
+import re
+import requests
+from fastapi import HTTPException
+from mmj_utils.api_schemas import ChatMessages, StreamAdd
+from mmj_utils.api_server import APIServer, APIMessage, Response
+from pydantic import BaseModel, Field, conlist, constr
+from time import time
+from typing import Optional, Dict, Any
+from uuid import uuid4
+
 from config import load_config
 
 
@@ -45,9 +42,9 @@ class VLMServer(APIServer):
 
         self.max_alerts = max_alerts
 
-        self.app.post("/api/v1/alerts")(self.alerts)
-        self.app.post("/api/v1/chat/completions")(self.chat_completion)
-        self.app.get("/api/v1/models")(self.get_model_name)
+        self.app.post("/v1/alerts")(self.alerts)
+        self.app.post("/v1/chat/completions")(self.chat_completion)
+        self.app.get("/v1/models")(self.get_model_name)
 
     def get_model_name(self):
         """

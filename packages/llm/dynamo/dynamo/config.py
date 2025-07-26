@@ -1,20 +1,23 @@
-from jetson_containers import CUDA_VERSION, SYSTEM_ARM
+from jetson_containers import CUDA_VERSION, SYSTEM_ARM, CUDA_ARCHITECTURES
 from packaging.version import Version
 
 def dynamo(version, version_spec=None, requires=None, default=False):
     pkg = package.copy()
 
     if requires:
-        pkg['requires'] = requires   
+        pkg['requires'] = requires
 
     if not version_spec:
         version_spec = version
 
     pkg['name'] = f'dynamo:{version}'
-        
+
     pkg['build_args'] = {
         'DYNAMO_VERSION': version,
         'DYNAMO_VERSION_SPEC': version_spec,
+        'COMPUTE_CAPABILITIES': ','.join([str(x) for x in CUDA_ARCHITECTURES]),
+        'CUDA_COMPUTE_CAP': ' '.join([str(x) for x in CUDA_ARCHITECTURES]),
+        'TORCH_CUDA_ARCH_LIST': ';'.join([f'{x / 10:.1f}' for x in CUDA_ARCHITECTURES]),
         'SYSTEM_ARM': SYSTEM_ARM
     }
 
@@ -30,5 +33,5 @@ def dynamo(version, version_spec=None, requires=None, default=False):
     return pkg, builder
 
 package = [
-    dynamo('0.2.2', '0.2.2', default=True),
+    dynamo('0.3.2', '0.3.2', default=True),
 ]

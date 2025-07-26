@@ -1,36 +1,32 @@
 #!/usr/bin/env python3
-import os
-import sys
-import shutil
 import copy
-import time
-import json
-import pprint
-import fnmatch
-import logging
-import traceback
-import subprocess
-import dockerhub_api
 import datetime
+import dockerhub_api
+import fnmatch
+import json
+import os
+import pprint
+import shutil
+import subprocess
+import sys
+import time
+import traceback
+from packaging.version import Version
 from typing import List, Dict, Any, Union
 
-from packaging.version import Version
-
-from .packages import find_package, find_packages, resolve_dependencies, validate_dict
-
-from .utils import (
-    split_container_name, query_yes_no, needs_sudo, sudo_prefix,
-    get_env, get_dir, get_repo_dir
+import logging
+from .l4t_version import (
+    L4T_VERSION, LSB_RELEASES, IS_TEGRA, l4t_version_from_tag, l4t_version_compatible,
+    get_l4t_base, get_cuda_arch, get_cuda_version, get_jetpack_version, get_lsb_release
 )
-
 from .logging import (
     get_log_dir, log_status, log_success, log_status, log_warning, log_debug,
     log_block, log_info, print_log, pprint_debug, colorize, LogConfig
 )
-
-from .l4t_version import (
-  L4T_VERSION, LSB_RELEASES, IS_TEGRA, l4t_version_from_tag, l4t_version_compatible,
-  get_l4t_base, get_cuda_arch, get_cuda_version, get_jetpack_version, get_lsb_release
+from .packages import find_package, find_packages, resolve_dependencies, validate_dict
+from .utils import (
+    split_container_name, query_yes_no, needs_sudo, sudo_prefix,
+    get_env, get_dir, get_repo_dir
 )
 
 _NEWLINE_=" \\\n"  # used when building command strings
@@ -406,17 +402,16 @@ def test_container(name, package, simulate=False, build_idx=None):
 
         cmd += f"  --volume {package['path']}:/test" + _NEWLINE_
         cmd += f"  --volume {get_dir('data')}:/data" + _NEWLINE_
-        cmd += f"  --workdir /test" + _NEWLINE_
         cmd += '  ' + name + _NEWLINE_
 
         cmd += "    /bin/bash -c '"
 
         if test_ext == ".py":
-            cmd += f"python3 {test}"
+            cmd += f"python3 /test/{test}"
         elif test_ext == ".sh":
-            cmd += f"/bin/bash {test}"
+            cmd += f"/bin/bash /test/{test}"
         else:
-            cmd += f"{test}"
+            cmd += f"/test/{test}"
 
         log_block(f"<b>> TESTING  {name}</b>", f"<b>{cmd}</b>\n")
 

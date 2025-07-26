@@ -1,7 +1,7 @@
 #---
 # name: kokoro-tts:onnx
 # group: audio
-# depends: [onnxruntime, numba, espeak]
+# depends: [torchaudio, onnxruntime, numba, espeak]
 # test: [test.py]
 #---
 ARG BASE_IMAGE
@@ -18,8 +18,8 @@ WORKDIR /opt
 # Clone the repository and modify pyproject.toml in one step
 RUN git clone https://github.com/thewh1teagle/kokoro-onnx.git && \
     cd kokoro-onnx && \
-    sed -i "/onnxruntime/d" pyproject.toml && \
-    sed -i "s/numpy>=2.0.2/numpy/" pyproject.toml && \
+    sed -i 's/==/>=/g' pyproject.toml && \
+    sed -i 's/~=/>=/g' pyproject.toml && \
     sed -i 's/providers = \["CPUExecutionProvider"\]/providers = \["CUDAExecutionProvider", "CPUExecutionProvider"\]/' src/kokoro_onnx/__init__.py && \
     pip install -e .
 

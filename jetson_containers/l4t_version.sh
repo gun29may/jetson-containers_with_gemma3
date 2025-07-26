@@ -1,7 +1,6 @@
-
 #!/bin/bash
 #
-# Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
+# Copyright (c) 2026, NVIDIA CORPORATION. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -22,28 +21,10 @@
 # DEALINGS IN THE SOFTWARE.
 #
 
-TEGRA="tegra"
-if [ -z "${SYSTEM_ARCH}" ]; then
-  ARCH=$(uname -m)
+echo "Detecting L4T version..."
+echo "CUDA_ARCH=${CUDA_ARCH}"
 
-  if [ "$ARCH" = "aarch64" ]; then
-    echo "### ARM64 architecture detected"
-    if uname -a | grep -qi "$TEGRA"; then
-      SYSTEM_ARCH="$TEGRA-$ARCH"
-      echo "### Jetson Detected"
-    else
-      echo "### SBSA Detected"
-      SYSTEM_ARCH="$ARCH"
-    fi
-  else
-    echo "### x86 Detected"
-    SYSTEM_ARCH="$ARCH"
-  fi
-fi
-
-echo "SYSTEM_ARCH=$SYSTEM_ARCH"
-
-if [ $SYSTEM_ARCH = "tegra-aarch64" ]; then
+if [ "${CUDA_ARCH}" = "tegra-aarch64" ]; then
 	L4T_VERSION_STRING=$(head -n 1 /etc/nv_tegra_release)
 
 	if [ -z "$L4T_VERSION_STRING" ]; then
@@ -71,7 +52,7 @@ if [ $SYSTEM_ARCH = "tegra-aarch64" ]; then
 
 	echo "L4T_VERSION:  $L4T_VERSION"
 
-elif [ $ARCH != "x86_64" ]; then
+elif [ "${ARCH}" != "x86_64" ]; then
 	echo "unsupported architecture:  $ARCH"
 	exit 1
 fi

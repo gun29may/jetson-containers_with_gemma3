@@ -8,7 +8,7 @@ fi
 pip3 install \
   compressed-tensors \
   datasets \
-  decord \
+  decord2 \
   fastapi \
   hf_transfer \
   huggingface_hub \
@@ -33,6 +33,7 @@ pip3 install \
   "blobfile>=3.0.0" \
   "anthropic" \
   "msgspec" \
+  orjson \
   litellm
 
 pip3 install sgl-kernel "sglang[all]~=${SGLANG_VERSION}" || \

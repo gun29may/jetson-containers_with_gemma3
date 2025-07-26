@@ -1,9 +1,9 @@
 #!/bin/bash
 set -ex
 
-CUDNN_MAJOR_VERSION=9
-CUDA_MAJOR_VERSION=12
-CUDA_VERSION=12.8
+CUDNN_MAJOR_VERSION=0
+CUDA_MAJOR_VERSION=13
+CUDA_VERSION=13.0
 
 prefix=/opt/nvidia/cudnn
 arch=$(uname -m)-linux-gnu
@@ -27,13 +27,13 @@ for cudnn_file in $(dpkg -L libcudnn${CUDNN_MAJOR_VERSION}-cuda-${CUDA_MAJOR_VER
     noarchinclude="${nosysprefix/#"include/${arch}"/include}"
     noverheader="${noarchinclude/%"_v${CUDNN_MAJOR_VERSION}.h"/.h}"
     noarchlib="${noverheader/#"lib/${arch}"/lib}"
-    
+
     if [[ -d "${prefix}" ]]; then
       link_name="${prefix}/${noarchlib}"
     else
       link_name="/usr/local/cuda/lib64/${noarchlib}"
     fi
-    
+
     link_dir=$(dirname "${link_name}")
     mkdir -p "${link_dir}"
     echo "linking ${cudnn_file} -> ${link_name}"

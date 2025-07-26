@@ -2,7 +2,7 @@
 # name: dynamo
 # group: dynamo
 # config: config.py
-# depends: [cuda, rust, cmake, ninja, pytorch, torchvision, torchaudio, transformers, mamba, triton, nixl, llvm:20, vllm, sglang]
+# depends: [pytorch, torchvision, torchaudio, triton, transformers, mamba, nixl, llvm:20, vllm, sglang, flashinfer]
 # requires: '>=34.1.0'
 # test: test.py
 # notes: https://github.com/ai-dynamo/dynamo
@@ -12,8 +12,14 @@ FROM ${BASE_IMAGE}
 
 ARG DYNAMO_VERSION \
     DYNAMO_VERSION_SPEC \
+    COMPUTE_CAPABILITIES \
+    CUDA_COMPUTE_CAP \
+    TORCH_CUDA_ARCH_LIST \
     SYSTEM_ARM
-    
+
+ENV COMPUTE_CAPABILITIES=${COMPUTE_CAPABILITIES} \
+    CUDA_COMPUTE_CAP=${CUDA_COMPUTE_CAP} \
+    TORCH_CUDA_ARCH_LIST=${TORCH_CUDA_ARCH_LIST}
 
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \

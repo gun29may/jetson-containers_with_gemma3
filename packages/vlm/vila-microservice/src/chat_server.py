@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,24 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from contextlib import asynccontextmanager
-from threading import Thread
-from time import time
-import logging
 import base64
 import io
+import logging
 import os
-
-from prometheus_client import start_http_server, Gauge
-from fastapi import FastAPI
-from PIL import Image
+import shutil
 import uvicorn
-
-from config import load_config
-
+from PIL import Image
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from mmj_utils.api_schemas import *
 from nano_llm import NanoLLM, ChatHistory
 from nano_llm.utils import print_table
-from mmj_utils.api_schemas import *
+from prometheus_client import start_http_server, Gauge
+from threading import Thread
+from time import time
+
+from config import load_config
 
 
 def decode_image(base64_string):
@@ -228,10 +227,20 @@ async def request_chat_completion(body: ChatMessages):
 #     """
 #     return {"model": config.model}
 
+def find_config_path(base_env_var):
+    config_path = os.environ[base_env_var]
+    config_path_under_data_dir = os.environ[f"{base_env_var}_UNDER_DATA_DIR"]
+
+    if os.path.exists(config_path_under_data_dir):
+        return config_path_under_data_dir
+    else:
+        os.makedirs(os.path.dirname(config_path_under_data_dir), exist_ok=True)
+        shutil.copy(config_path, config_path_under_data_dir)
+        return config_path_under_data_dir
 
 if __name__ == "__main__":
     #Load config
-    config_path = os.environ["CHAT_SERVER_CONFIG_PATH"]
+    config_path = find_config_path("CHAT_SERVER_CONFIG_PATH")
     config = load_config(config_path, "chat_server")
 
     logging.basicConfig(level=logging.getLevelName(config.log_level),

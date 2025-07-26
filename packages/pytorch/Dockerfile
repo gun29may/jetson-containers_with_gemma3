@@ -3,7 +3,7 @@
 # alias: torch
 # group: pytorch
 # config: config.py
-# depends: [cuda, cudnn, numpy, onnx]
+# depends: [cuda, cudnn, nccl, gdrcopy, nvpl, numpy, onnx]
 # test: [test.sh, test.py]
 # docs: |
 #  Containers for PyTorch with CUDA support.
@@ -27,12 +27,15 @@ ARG TORCH_CUDA_ARCH_LIST \
     USE_PYTORCH_QNNPACK=1 \
     USE_BLAS=1 \
     BLAS="OpenBLAS" \
+    DISTRO="ubuntu2204" \
     FORCE_BUILD=off \
     PYTORCH_OFFICIAL_WHL=off
 
 ENV TORCH_CUDA_ARCH_LIST=${TORCH_CUDA_ARCH_LIST} \
     PIP_EXTRA_INDEX_URL=${PIP_EXTRA_INDEX_URL} \
     TORCH_HOME=/data/models/torch
+
+ENV TORCH_NVCC_FLAGS="-Xfatbin -compress-all -compress-mode=balance"
 
 COPY install.sh build.sh /tmp/pytorch/
 
