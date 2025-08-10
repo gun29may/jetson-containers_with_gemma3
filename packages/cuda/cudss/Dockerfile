@@ -1,19 +1,19 @@
 #---
-# name: nccl
+# name: cudss
 # group: cuda
 # depends: [cuda]
 # config: config.py
+# test: test.sh
 #---
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-ARG NCCL_VERSION \
+ARG CUDSS_VERSION \
     CUDA_ARCH \
     IS_SBSA \
     FORCE_BUILD=off \
-    DISTRO="ubuntu2404" \
-    CUDA_ARCH \
-    TMP=/tmp/nccl
+    DISTRO="ubuntu2004" \
+    TMP=/tmp/cudss
 
 RUN apt-get update && \
     apt-get install -y dkms
@@ -28,6 +28,5 @@ RUN apt-get update -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY install.sh /tmp/nccl/
-RUN /tmp/nccl/install.sh
-
+COPY install.sh /tmp/cudss/install.sh
+RUN /tmp/cudss/install.sh
